@@ -61,28 +61,27 @@ let router = new VueRouter({
 })
 
 
-//全局路由导航守卫
-// router.beforeEach((to,from,next)=>{
-//     if(to.matched.length ===0) {
-//         //提示错误信息
-//         Vue.prototype.$message.error('地址不正确,没有该页面')
-//         next('/error')
-//     }
-
-//     //如果是登录页
-//     if(to.meta.noLogin === true) {
-//         next()
-//     }else {
-//         //不是登录页
-//         if(window.sessionStorage.getItem('token')) {
-//             next()
-//         }else {
-//             //未登录
-//             Vue.prototype.$message.error('未登录,请输入账号和密码')
-//             next('/login')
-//         }
-//     }
-// })
+// 全局路由导航守卫
+router.beforeEach((to,from,next)=>{
+    if(to.matched.length ===0) {
+        //提示错误信息
+        Vue.prototype.$message.error('地址不正确,没有该页面')
+        next('/error')
+    }
+    //如果是登录页
+    if(to.meta.noLogin === true) {
+        next()
+    }else {
+        //不是登录页
+        if(window.sessionStorage.getItem('token')) {
+            next()
+        }else {
+            //未登录
+            Vue.prototype.$message.error('未登录,请输入账号和密码')
+            next('/login')
+        }
+    }
+})
 
 
 export default router

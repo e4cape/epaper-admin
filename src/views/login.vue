@@ -73,21 +73,22 @@ export default {
       this.$refs[formName].validate(async valid => {
         if (valid) {
           // 成功 提交数据
-          let res = await this.$axios.post("login", this.loginForm);
+          let res = await this.$axios.post("sysUser/login", this.loginForm);
           console.log(res);
-          if (res.data.meta.status === 400) {
-            this.$message.error(res.data.meta.msg);
-          } else if (res.data.meta.status === 200) {
-            this.$message.success(res.data.meta.msg);
-            // 缓存数据
-            window.sessionStorage.setItem("token", res.data.data.token);
-            // 跳转 到主页
-            this.$router.push("/");
-          }
+
+          // if (res.data.meta.status === 400) {
+          //   this.$message.error(res.data.meta.msg);
+          // } else if (res.data.meta.status === 200) {
+          //   this.$message.success(res.data.meta.msg);
+          //   // 缓存数据
+          //   window.sessionStorage.setItem("token", res.data.data.token);
+          //   // 跳转 到主页
+          //   this.$router.push("/");
+          // }
         } else {
-          // 失败
-          this.$message.error("数据格式错误，请根据提示修改");
-          return false;
+          // // 失败
+          // this.$message.error("数据格式错误，请根据提示修改");
+          // return false;
         }
       });
     },
@@ -106,9 +107,9 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url(https://i1.mifile.cn/f/i/2019/mi9/index/index2.jpg?v=1) center;
   background-size: 100%;
   overflow: hidden;
+  background-color: @aside-color;
   .loginBox {
     background-color: #fff;
     width: 550px;
