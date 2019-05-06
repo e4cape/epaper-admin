@@ -20,10 +20,10 @@
         class="my-form"
       >
         <el-form-item  prop="username">
-          <el-input v-model="loginForm.username" placeholder="请输入登录账号"></el-input>
+          <el-input v-model="loginForm.username" placeholder="请输入登录账号" ></el-input>
         </el-form-item>
         <el-form-item  prop="password">
-          <el-input v-model="loginForm.password" placeholder="请输入密码"></el-input>
+          <el-input v-model="loginForm.password" placeholder="请输入密码" ></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submit('loginForm')" style="background:#dd2b2b" class="my-btn">登录</el-button>
@@ -35,15 +35,17 @@
   </div>
 </template>
 
+
 <script>
+// import Login from '../API/login.js'
 export default {
   name: "login",
   data() {
     return {
       // 表单数据
       loginForm: {
-        username: "",
-        password: ""
+        username: "admin",
+        password: "123456"
       },
       // 表单验证 规则
       rules: {
@@ -75,21 +77,20 @@ export default {
           // 成功 提交数据
           let res = await this.$axios.post("sysUser/login", this.loginForm);
           console.log(res);
-
-          // if (res.data.meta.status === 400) {
-          //   this.$message.error(res.data.meta.msg);
-          // } else if (res.data.meta.status === 200) {
-          //   this.$message.success(res.data.meta.msg);
-          //   // 缓存数据
-          //   window.sessionStorage.setItem("token", res.data.data.token);
-          //   // 跳转 到主页
-          //   this.$router.push("/");
-          // }
-        } else {
-          // // 失败
-          // this.$message.error("数据格式错误，请根据提示修改");
-          // return false;
-        }
+          //另外一种封装的api
+          // let res = await Login.login(this.loginForm)
+          // console.log(res);
+          
+          //登陆成功
+          if(res.data.code ===200) {
+            this.$message.success(res.data.message);
+            //设置token
+            window.sessionStorage.setItem("token", res.data.data.token);
+            this.$router.push("/")
+          } else {
+            this.$message.error(res.data.message);
+          }
+        } 
       });
     },
     // 重置表单

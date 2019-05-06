@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "core-js": "^2.6.5",
+    "dayjs": "^1.8.13",
     "element-ui": "^2.8.2",
     "vue": "^2.6.10",
     "vue-router": "^3.0.6"

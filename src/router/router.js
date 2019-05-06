@@ -13,9 +13,27 @@ const error = () => import("../views/error.vue");
 const dataStatistics = () => import("../views/console/dataStatistics.vue");
 const platformAccount = () => import("../views/console/platformAccount.vue");
 
+//订单管理模块
+const orders = () => import("../views/orderManagement/orders.vue");
+const supplyGoods = () => import("../views/orderManagement/supplyGoods.vue");
 
-//会员管理模块
+//客户管理模块
 const customerList = () => import("../views/customerManagement/customerList.vue");
+const merchant = () => import("../views/customerManagement/merchant.vue");
+
+
+//平台运营模块
+const auditList = () => import("../views/platformRunning/auditList.vue");
+const ads = () => import("../views/platformRunning/ads.vue");
+const postsList = () => import("../views/platformRunning/postsList.vue");
+const postsCategory = () => import("../views/platformRunning/postsCategory.vue");
+const manager = () => import("../views/platformRunning/manager.vue");
+const role = () => import("../views/platformRunning/role.vue");
+
+
+//商品管理模块
+const merchantGoods = () => import("../views/goodsManagement/merchantGoods.vue");
+const activityGoods = () => import("../views/goodsManagement/activityGoods.vue");
 
 
 //路由规则
@@ -38,19 +56,85 @@ let routes = [
 
     //嵌套的路由
     children:[
+
+        //控制台
+        //数据统计
         {
             path:'dataStatistics',
             component:dataStatistics
         },
+        //平台流水
         {
             path:'platformAccount',
             component:platformAccount
         },
+
+
+        //订单管理
+        //商城订单
+        {
+            path:'orders',
+            component:orders
+        },
+        //货源列表
+        {
+            path:'supplyGoods',
+            component:supplyGoods
+        },
+
+
+        //客户管理
+        //会员列表
         {
             path:'customerList',
             component:customerList
         },
+        //商家列表
+        {
+            path:'merchant',
+            component:merchant
+        },
 
+
+        //平台运营
+        //审核列表
+        {
+            path:'auditList',
+            component:auditList
+        },
+        {
+            path:'ads',
+            component:ads
+        },
+        {
+            path:'postsList',
+            component:postsList
+        },
+        {
+            path:'postsCategory',
+            component:postsCategory
+        },
+        {
+            path:'manager',
+            component:manager
+        },
+        {
+            path:'role',
+            component:role
+        },
+
+
+        //商品管理
+        //商家商品
+        {
+            path:'merchantGoods',
+            component:merchantGoods
+        },
+        //活动商品
+        {
+            path:'activityGoods',
+            component:activityGoods
+        }
     ]
   }
 ];

@@ -47,48 +47,42 @@
                 <span>订单管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="2-1">商城订单</el-menu-item>
-                <el-menu-item index="2-2">货源列表</el-menu-item>
+                <el-menu-item index="orders">商城订单</el-menu-item>
+                <el-menu-item index="supplyGoods">货源列表</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="3">
               <template slot="title">
-                <i class="el-icon-monitor"></i>
-                <span>控制台</span>
+                <i class="el-icon-s-custom"></i>
+                <span>客户管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="1-1">数据统计</el-menu-item>
-                <el-menu-item index="1-2">平台流水</el-menu-item>
+                <el-menu-item index="customerList">会员列表</el-menu-item>
+                <el-menu-item index="merchant">商家列表</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="4">
               <template slot="title">
-                <i class="el-icon-s-order"></i>
-                <span>订单管理</span>
+                <i class="el-icon-menu"></i>
+                <span>平台运营</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="2-1">商城订单</el-menu-item>
-                <el-menu-item index="2-2">货源列表</el-menu-item>
+                <el-menu-item index="auditList">审核列表</el-menu-item>
+                <el-menu-item index="ads">广告图</el-menu-item>
+                <el-menu-item index="postsList">文章列表</el-menu-item>
+                <el-menu-item index="postsCategory">文章分类</el-menu-item>
+                <el-menu-item index="manager">管理员</el-menu-item>
+                <el-menu-item index="role">角色</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="5">
               <template slot="title">
-                <i class="el-icon-monitor"></i>
-                <span>控制台</span>
+                <i class="el-icon-shopping-bag-1"></i>
+                <span>商品管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="1-1">数据统计</el-menu-item>
-                <el-menu-item index="1-2">平台流水</el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
-            <el-submenu index="6">
-              <template slot="title">
-                <i class="el-icon-s-order"></i>
-                <span>订单管理</span>
-              </template>
-              <el-menu-item-group>
-                <el-menu-item index="2-1">商城订单</el-menu-item>
-                <el-menu-item index="2-2">货源列表</el-menu-item>
+                <el-menu-item index="merchantGoods">商家商品</el-menu-item>
+                <el-menu-item index="activityGoods">活动商品</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             

@@ -53,7 +53,7 @@
     </div>
     <!-- 主体区域 -->
     <div class="main">
-      <el-button type="primary">批量备注</el-button>
+      <el-button type="primary" @click="dialogFormVisible = true">批量备注</el-button>
       <el-table
         ref="multipleTable"
         :data="tableData"
@@ -64,18 +64,34 @@
         class="my-table"
       >
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="count" label="账号" width="160"></el-table-column>
-        <el-table-column prop="phone" label="手机" width="160"></el-table-column>
-        <el-table-column prop="pay" label="消费金额" width="160"></el-table-column>
-        <el-table-column prop="source" label="注册来源" width="160"></el-table-column>
-        <el-table-column label="注册日期" width="160">
-          <template slot-scope="scope">{{ scope.row.date }}</template>
+        <el-table-column prop="memberAccount" label="账号" width="160" align="center"></el-table-column>
+        <el-table-column prop="memberPhone" label="手机" width="160" align="center"></el-table-column>
+        <el-table-column prop="amount" label="消费金额" width="160" align="center"></el-table-column>
+        <el-table-column label="注册来源" width="160" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.memberSource | getSource}}</span>
+          </template>
         </el-table-column>
-        <el-table-column prop="ComCount" label="企业账号" width="160"></el-table-column>
-        <el-table-column prop="forwarding" label="承运商" width="160"></el-table-column>
-        <el-table-column prop="comment" label="用户备注" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="option" label="操作" show-overflow-tooltip width="120">
-          <el-link type="primary" :underline="false" @click="preview">查看</el-link>
+        <el-table-column label="注册日期" width="160" align="center">
+          <template
+            slot-scope="scope"
+          >{{ scope.row.memberCreate | formatTime('YYYY-MM-DD HH:mm:ss')}}</template>
+        </el-table-column>
+        <el-table-column prop label="企业账号" width="160" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.memberType | getMember}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="承运商" width="160" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.carrierState | getCarrier}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop label="用户备注" show-overflow-tooltip align="center"></el-table-column>
+        <el-table-column label="操作" show-overflow-tooltip width="120" align="center">
+          <template slot-scope="scope">
+            <el-link type="primary" :underline="false" @click="preview(scope.row.memberCompany)">查看</el-link>
+          </template>
         </el-table-column>
       </el-table>
 
@@ -84,10 +100,9 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="400"
+        :page-size="pageSize"
+        layout="total, prev, pager, next, jumper"
+        :total="totalPages"
         background
         class="my-page"
       ></el-pagination>
@@ -97,18 +112,12 @@
     <el-dialog title="会员资料" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
       <div>
         <h5>企业资料</h5>
-        <img
-          src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
-          style="width:120px"
-        >
-        <img
-          src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
-          style="width:120px"
-        >
+        <img :src="businessLicenseUrl" style="width:120px">
+        <img :src="openBankCertificateUrl" style="width:120px">
       </div>
       <div>
         <h5>承运商资料</h5>
-        <img
+        <!-- <img
           src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
           style="width:120px"
         >
@@ -119,84 +128,60 @@
         <img
           src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
           style="width:120px"
-        >
+        >-->
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 批量备注对话框 -->
+    <el-dialog title="批量备注" :visible.sync="dialogFormVisible" width="800px">
+      <el-form :model="form">
+        <el-form-item label="备注内容" :label-width="formLabelWidth">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { log } from "util";
+import loginVue from "../login.vue";
 export default {
   name: "customerList",
   data() {
     return {
       //表单数据
       formInline: {
-        user: "",
-        region: "",
-        dataValue: ""
+        account: "",
+        phoneNum: "",
+        source: "",
+        
       },
       //表格数据
-      tableData: [
-        {
-          count: "13733411106",
-          phone: "13733411106",
-          pay: "54888",
-          source: "PC端",
-          date: "2016-05-03",
-          ComCount: "是",
-          forwarding: "否",
-          comment: "大客户"
-        },
-        {
-          count: "13733411106",
-          phone: "13733411106",
-          pay: "54888",
-          source: "PC端",
-          date: "2016-05-03",
-          ComCount: "是",
-          forwarding: "否",
-          comment: "大客户"
-        },
-        {
-          count: "13733411106",
-          phone: "13733411106",
-          pay: "54888",
-          source: "PC端",
-          date: "2016-05-03",
-          ComCount: "是",
-          forwarding: "否",
-          comment: "大客户"
-        },
-        {
-          count: "13733411106",
-          phone: "13733411106",
-          pay: "54888",
-          source: "PC端",
-          date: "2016-05-03",
-          ComCount: "是",
-          forwarding: "否",
-          comment: "大客户"
-        },
-        {
-          count: "13733411106",
-          phone: "13733411106",
-          pay: "54888",
-          source: "PC端",
-          date: "2016-05-03",
-          ComCount: "是",
-          forwarding: "否",
-          comment: "大客户"
-        }
-      ],
+      tableData: [],
       multipleSelection: [],
       //对话框的可见性
       dialogVisible: false,
       //当前页码
-      currentPage:1,
+      currentPage: 1,
+      pageSize: 10,
+      totalPages: 0,
+      //备注对话框的可见性
+      dialogFormVisible: false,
+      form: {
+        name: ""
+      },
+      formLabelWidth: "120px",
+      //企业资料
+      businessLicenseUrl: "",
+      openBankCertificateUrl: ""
     };
   },
   methods: {
@@ -206,17 +191,57 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    //查看事件
-    preview() {
+    //查看资料事件
+    preview(url) {
+      if (!url) {
+        this.$message.error('该用户无资料');
+        return;
+      }
+      //赋给图片路径
+      console.log(url);
+      //转json
+      var newUrl=JSON.parse(url); 
+      this.businessLicenseUrl = newUrl.businessLicenseUrl;
+      this.openBankCertificateUrl = newUrl.openBankCertificateUrl;
+      console.log(newUrl.businessLicenseUrl,newUrl.openBankCertificateUrl);
       this.dialogVisible = true;
     },
     //页码改变事件
     handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
-      },
-      handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    },
+    //获取会员列表
+    async getCustomerLists() {
+      let res = await this.$axios.get(
+        `sysUser/memberLists?currentPage=${this.currentPage}&pageSize=10`
+      );
+      console.log(res);
+      if (res.data.code === 200) {
+        this.tableData = res.data.data.list;
+        this.totalPages = res.data.data.list.length;
       }
+    }
+  },
+  created() {
+    this.getCustomerLists();
+  },
+  //过滤器
+  filters: {
+    //过滤承运商
+    getCarrier(value) {
+      return value == 1 ? "是" : "否";
+    },
+    //过滤企业账号
+    getMember(value) {
+      return value == 2 ? "是" : "否";
+    },
+    //过滤来源
+    getSource(value) {
+      return value == 1 ? "PC端" : "小程序";
+    }
   }
 };
 </script>
@@ -232,14 +257,12 @@ export default {
   }
 }
 .main {
-
   margin-top: 20px;
   .my-table {
     margin-top: 20px;
   }
-  .my-page{
+  .my-page {
     margin-top: 30px;
-
   }
 }
 </style>
