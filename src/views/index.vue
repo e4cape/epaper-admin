@@ -22,14 +22,13 @@
         <!-- 侧边栏 -->
         <el-aside width="200px" class="my-aside">
           <el-menu
-            default-active="2"
+            :default-active="2"
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
             router
             background-color="#324157"
             text-color="#fff"
-            
           >
             <el-submenu index="1">
               <template slot="title">
@@ -37,7 +36,7 @@
                 <span>控制台</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="customerList">数据统计</el-menu-item>
+                <el-menu-item index="dataStatistics" >数据统计</el-menu-item>
                 <el-menu-item index="platformAccount">平台流水</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
@@ -57,7 +56,7 @@
                 <span>客户管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="customerList">会员列表</el-menu-item>
+                <el-menu-item index="customerList" @click="reload">会员列表</el-menu-item>
                 <el-menu-item index="merchant">商家列表</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
@@ -90,7 +89,7 @@
         </el-aside>
         <!-- 主体区域 -->
         <el-main class="my-main">
-            <router-view></router-view>
+            <router-view :key="$route.path"></router-view>
         </el-main>
       </el-container>
     </el-container>
@@ -102,7 +101,16 @@ export default {
   name: "index",
   data() {
     return {};
+  },
+  methods:{
+    reload(){
+      // window.location.reload;
+      // console.log('页面刷新啦');
+      // this.$message.success('页面刷新啦');
+      this.$router.go(0);
+    }
   }
+  
 };
 </script>
 

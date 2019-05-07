@@ -1,6 +1,6 @@
 <template>
     <div id="postsList">
-
+      啦啦啦啦
     </div>
    
 </template>
