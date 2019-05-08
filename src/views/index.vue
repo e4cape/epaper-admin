@@ -11,8 +11,8 @@
           </el-col>
           <el-col :span="4" class="header-role">
             <div>
-              <span>超级管理员</span> &nbsp;&nbsp;|&nbsp;&nbsp;
-              <a href="#">退出</a>
+              <span>{{roleRemark}}</span> &nbsp;&nbsp;|&nbsp;&nbsp;
+              <a href="#" @click="logout">退出</a>
             </div>
           </el-col>
         </el-row>
@@ -36,7 +36,7 @@
                 <span>控制台</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="dataStatistics" >数据统计</el-menu-item>
+                <el-menu-item index="dataStatistics">数据统计</el-menu-item>
                 <el-menu-item index="platformAccount">平台流水</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
@@ -56,7 +56,7 @@
                 <span>客户管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="customerList" @click="reload">会员列表</el-menu-item>
+                <el-menu-item index="customerList">会员列表</el-menu-item>
                 <el-menu-item index="merchant">商家列表</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
@@ -84,12 +84,11 @@
                 <el-menu-item index="activityGoods">活动商品</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
-            
           </el-menu>
         </el-aside>
         <!-- 主体区域 -->
         <el-main class="my-main">
-            <router-view :key="$route.path"></router-view>
+          <router-view></router-view>
         </el-main>
       </el-container>
     </el-container>
@@ -100,7 +99,9 @@
 export default {
   name: "index",
   data() {
-    return {};
+    return {
+      roleRemark:''
+    };
   },
   methods:{
     reload(){
@@ -108,7 +109,35 @@ export default {
       // console.log('页面刷新啦');
       // this.$message.success('页面刷新啦');
       this.$router.go(0);
+    },
+    //退出功能
+    async logout(){
+       console.log('点退出了');
+      console.log(window.sessionStorage.getItem("token"));
+      let res = await this.$axios.get(`sysUser/logout?token=${window.sessionStorage.getItem("token")}`);
+      console.log(res);
+      
+      if (res.data.code === 200) {
+        this.$message.success(res.data.message);
+       // 删除token
+      window.sessionStorage.removeItem("token");
+      // 编程式导航 去登录页
+      this.$router.push("/login");
+      } else {
+        this.$message.error(res.data.message);
+      }
     }
+  },
+  async created(){
+      //查询角色的接口
+      let res = await this.$axios.get(`sysRole/selectRole?token=${window.sessionStorage.getItem("token")}`);
+      console.log(res);
+      if (res.data.code === 200) {
+        //显示右上角的角色名字
+        this.roleRemark=res.data.data[0].remark;
+        //同时将roleName存在sessionStorage中,方便其他页面调用
+        window.sessionStorage.setItem("roleName",res.data.data[0].roleName)
+      }
   }
   
 };
@@ -122,8 +151,8 @@ export default {
   .index-container {
     height: 100%;
     .my-header {
-    background-color: @aside-color;
-    color:#fff;
+      background-color: @aside-color;
+      color: #fff;
       text-align: center;
       line-height: 60px;
       .header-title {
@@ -137,13 +166,12 @@ export default {
         }
       }
     }
-    .my-aside{
-        background-color: @aside-color;
+    .my-aside {
+      background-color: @aside-color;
     }
-    .my-main{
-
-        margin-top: 15px;
-        margin-left: 15px;
+    .my-main {
+      margin-top: 15px;
+      margin-left: 15px;
     }
   }
 }

@@ -99,10 +99,8 @@
 
     <!-- 分页器 -->
     <el-pagination
-      @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="currentPage"
-      :page-size="pageSize"
       layout="total, prev, pager, next, jumper"
       :total="totalPages"
       background
@@ -175,7 +173,6 @@ export default {
       dialogVisible: false,
       //当前页码
       currentPage: 1,
-      pageSize: 10,
       totalPages: 0,
       //备注对话框的可见性
       dialogFormVisible: false,
