@@ -9,15 +9,15 @@
         <el-form-item label="手机号">
           <el-input v-model="formInline.phoneNum" placeholder="请输入手机号" class="my-input" clearable></el-input>
         </el-form-item>
-        <el-form-item label="注册来源" >
+        <el-form-item label="注册来源">
           <el-select v-model="formInline.source" placeholder="注册来源" class="my-input" clearable>
             <el-option label="PC端" value="1"></el-option>
             <el-option label="小程序端" value="2"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select  v-model="formInline.state" class="my-input" >
-            <el-option label="正常" :value="1" ></el-option>
+          <el-select v-model="formInline.state" class="my-input">
+            <el-option label="正常" :value="1"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="注册日期">
@@ -45,7 +45,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="承运商">
-          <el-select v-model="formInline.isCarrier" placeholder="是否承运商" class="my-input" clearable> 
+          <el-select v-model="formInline.isCarrier" placeholder="是否承运商" class="my-input" clearable>
             <el-option label="是" value="1"></el-option>
             <el-option label="否" value="0"></el-option>
           </el-select>
@@ -54,7 +54,7 @@
     </div>
     <!-- 主体区域 -->
     <div class="main">
-      <el-button type="primary" @click="dialogFormVisible = true" >批量备注</el-button>
+      <el-button type="primary" @click="dialogFormVisible = true">批量备注</el-button>
       <el-table
         ref="multipleTable"
         :data="tableData"
@@ -74,9 +74,7 @@
           </template>
         </el-table-column>
         <el-table-column label="注册日期" width="160" align="center">
-          <template
-            slot-scope="scope"
-          >{{ scope.row.memberCreate | formatTime('YYYY-MM-DD')}}</template>
+          <template slot-scope="scope">{{ scope.row.memberCreate | formatTime('YYYY-MM-DD')}}</template>
         </el-table-column>
         <el-table-column prop label="企业账号" width="160" align="center">
           <template slot-scope="scope">
@@ -161,10 +159,10 @@ export default {
         account: "",
         phoneNum: "",
         source: "",
-        state:1,
-        isCom:'',
-        isCarrier:'',
-        dataValue:[]
+        state: 1,
+        isCom: "",
+        isCarrier: "",
+        dataValue: []
       },
       //表格数据
       tableData: [],
@@ -187,21 +185,26 @@ export default {
   },
   methods: {
     //清除条件
-    clear(){
-        this.formInline.account='';
-        this.formInline.phoneNum='';
-        this.formInline.source='';
-        // console.log(this.formInline.source);
-        this.formInline.isCom='';
-        this.formInline.isCarrier='';
-        this.formInline.dataValue=[,];
-        // console.log(this.formInline.dataValue[0],this.formInline.dataValue[1]);
+    clear() {
+      this.formInline.account = "";
+      this.formInline.phoneNum = "";
+      this.formInline.source = "";
+      // console.log(this.formInline.source);
+      this.formInline.isCom = "";
+      this.formInline.isCarrier = "";
+      this.formInline.dataValue = [,];
+      // console.log(this.formInline.dataValue[0],this.formInline.dataValue[1]);
     },
     //查询事件
     async search() {
-        let res = await this.$axios.get(
-        `sysUser/memberLists?currentPage=1&pageSize=10&account=${this.formInline.account}&phone=${this.formInline.phoneNum}&source=${this.formInline.source}
-        &carrierType=${this.formInline.isCarrier}&memberType=${this.formInline.isCom}&startTime=${this.formInline.dataValue[0] || ''}&endTime=${this.formInline.dataValue[1]||''}
+      let res = await this.$axios.get(
+        `sysUser/memberLists?currentPage=1&pageSize=10&account=${
+          this.formInline.account
+        }&phone=${this.formInline.phoneNum}&source=${this.formInline.source}
+        &carrierType=${this.formInline.isCarrier}&memberType=${
+          this.formInline.isCom
+        }&startTime=${this.formInline.dataValue[0] || ""}&endTime=${this
+          .formInline.dataValue[1] || ""}
         `
       );
       console.log(this.formInline.source);
@@ -234,16 +237,8 @@ export default {
       this.dialogVisible = true;
     },
     //页码改变事件
-    async handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-      let res = await this.$axios.get(
-        `sysUser/memberLists?currentPage=${val}&pageSize=10`
-      );
-      console.log(res);
-      if (res.data.code === 200) {
-        this.tableData = res.data.data.list;
-        this.totalPages = res.data.data.list.length;
-      }
+    handleCurrentChange() {
+      this.getCustomerLists();
     },
     //获取会员列表
     async getCustomerLists() {
@@ -257,22 +252,24 @@ export default {
       }
     },
     //批量备注事件
-    async postComment(){
-
+    async postComment() {
       var newSelection = [];
-      for(var i=0;i<this.multipleSelection.length;i++) {
-        var myId=this.multipleSelection[i].memberId;
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        var myId = this.multipleSelection[i].memberId;
         // console.log(myId);
-        this.multipleSelection[i].memberRemark=this.form.content;
+        this.multipleSelection[i].memberRemark = this.form.content;
         // console.log(this.multipleSelection[i].memberRemark);
-        newSelection.push({memberId:myId,memberRemark:this.multipleSelection[i].memberRemark})
+        newSelection.push({
+          memberId: myId,
+          memberRemark: this.multipleSelection[i].memberRemark
+        });
       }
 
-      let res =  await this.$axios.post(`sysUser/memberRemark`,newSelection);
-        console.log(res);
+      let res = await this.$axios.post(`sysUser/memberRemark`, newSelection);
+      console.log(res);
 
-       if (res.data.code === 200) {
-         this.getCustomerLists();
+      if (res.data.code === 200) {
+        this.getCustomerLists();
       }
 
       this.dialogFormVisible = false;
@@ -281,8 +278,8 @@ export default {
   created() {
     this.getCustomerLists();
   },
-  mounted(){
-    console.log('页面刷新了');
+  mounted() {
+    // console.log('页面刷新了');
   },
   //过滤器
   filters: {
@@ -314,7 +311,7 @@ export default {
     .my-date-picker {
       margin-right: 25px;
     }
-    .mySearch{
+    .mySearch {
       position: absolute;
       right: 30px;
     }

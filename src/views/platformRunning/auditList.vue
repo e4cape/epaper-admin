@@ -33,6 +33,16 @@
             </template>
           </el-table-column>
         </el-table>
+
+        <!-- 货源审核的分页器 -->
+        <el-pagination
+          @current-change="auditPageChange"
+          :current-page="auditPage"
+          layout="total, prev, pager, next, jumper"
+          :total="auditTotals"
+          background
+          class="my-page"
+        ></el-pagination>
       </el-tab-pane>
 
       <el-tab-pane label="承运商审核" name="second">
@@ -50,11 +60,25 @@
           </el-table-column>
           <el-table-column prop="carrierState" label="操作" align="center">
             <template slot-scope="scope">
-              <el-link type="primary" :underline="false" v-if="scope.row.carrierState ==2" @click="getCarrierId(scope.row.carrierId)">审核</el-link>
+              <el-link
+                type="primary"
+                :underline="false"
+                v-if="scope.row.carrierState ==2"
+                @click="getCarrierId(scope.row.carrierId)"
+              >审核</el-link>
               <el-link type="info" :underline="false" v-else>无</el-link>
             </template>
           </el-table-column>
         </el-table>
+        <!-- 承运商审核的分页器 -->
+        <el-pagination
+          @current-change="carrierPageChange"
+          :current-page="carrierPage"
+          layout="total, prev, pager, next, jumper"
+          :total="carrierTotals"
+          background
+          class="my-page"
+        ></el-pagination>
       </el-tab-pane>
 
       <el-tab-pane label="企业审核" name="third">
@@ -79,23 +103,27 @@
           </el-table-column>
           <el-table-column prop="memberCompany" label="操作" align="center">
             <template slot-scope="scope">
-              <el-link type="primary" :underline="false" v-if="scope.row.memberCompany.state ==1">审核</el-link>
+              <el-link
+                type="primary"
+                :underline="false"
+                v-if="scope.row.memberCompany.state ==1"
+                @click="getMemberId(scope.row.memberId)"
+              >审核</el-link>
               <el-link type="info" :underline="false" v-else>无</el-link>
             </template>
           </el-table-column>
         </el-table>
+        <!-- 公司审核的分页器 -->
+        <el-pagination
+          @current-change="companyPageChange"
+          :current-page="companyPage"
+          layout="total, prev, pager, next, jumper"
+          :total="companyTotals"
+          background
+          class="my-page"
+        ></el-pagination>
       </el-tab-pane>
     </el-tabs>
-
-    <!-- 分页器 -->
-    <el-pagination
-      @current-change="handleCurrentChange"
-      :current-page="currentPage"
-      layout="total, prev, pager, next, jumper"
-      :total="totalPages"
-      background
-      class="my-page"
-    ></el-pagination>
 
     <!-- 货源审核弹出框 -->
     <el-dialog title="审核详情" :visible.sync="auditVisible" width="400px">
@@ -133,6 +161,23 @@
         <el-button type="primary" @click="carrierCheck">确定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 企业审核弹出框 -->
+    <el-dialog title="审核详情" :visible.sync="companyVisible" width="400px">
+      <el-form :model="companyForm">
+        <el-form-item label="是否通过">
+          <el-radio v-model="companyForm.companyRadio" label="1">通过</el-radio>
+          <el-radio v-model="companyForm.companyRadio" label="0">驳回</el-radio>
+        </el-form-item>
+        <el-form-item label="审核理由">
+          <el-input type="textarea" :rows="4" placeholder="请输入内容" v-model="companyForm.companyText"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="companyVisible = false">取 消</el-button>
+        <el-button type="primary" @click="carrierCheck">确定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -149,143 +194,206 @@ export default {
       //当前页码
       currentPage: 1,
       totalPages: 0,
+      //货源审核的页码
+      auditPage: 1,
+      auditTotals: 0,
+      //承运商审核的页码
+      carrierPage:1,
+      carrierTotal:0,
+      //公司审核的页码
+      companyPage:1,
+      companyTotal:0,
       //三个审核对话框的可见性
       auditVisible: false,
       carrierVisible: false,
       companyVisible: false,
       auditForm: {
         auditRadio: "1",
-        auditText:'',
-        guidePrice:''
+        auditText: "",
+        guidePrice: ""
       },
-      carrierForm:{
+      carrierForm: {
         carrierRadio: "1",
-        carrierText:''
+        carrierText: ""
       },
-      companyForm:{
-
+      companyForm: {
+        companyRadio: "",
+        companyText: ""
       },
       //货源审核发请求的数据
-      checkList:{
-        routeCheckReason:'',
-        routeCheckUser:'',
-        routeGuidePrice:'',
-        routeId:0,
+      checkList: {
+        routeCheckReason: "",
+        routeCheckUser: "",
+        routeGuidePrice: "",
+        routeId: 0,
         //默认让通过,填1,不通过就传2
-        routeState:1
+        routeState: 1
       },
       //承运商审核发请求的数据
-      carrierList:{
-        carrierCheck:'',
-        carrierId:0,
+      carrierList: {
+        carrierCheck: "",
+        carrierId: 0,
         //默认让通过,填1,不通过就传0
-        carrierState:1
+        carrierState: 1
+      },
+      //公司审核发请求的数据
+      companyList: {
+        check: "",
+        memberId: 0,
+        memberState: 1
       },
       //表单校验规则
-      rules:{
+      rules: {
         guidePrice: [
-            { required: true, message: '请输入指导价格', trigger: 'blur' },
-            // { min: 1, max: 10, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-          ]
+          { required: true, message: "请输入指导价格", trigger: "blur" }
+          // { min: 1, max: 10, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ]
       }
-      
     };
   },
   methods: {
     //获取货源审核列表事件
     async getAuditCheck() {
       let res = await this.$axios.get(
-        `sysUser/pageList?currentPage=${this.currentPage}&pageSize=10`
+        `sysUser/pageList?currentPage=${this.auditPage}&pageSize=10`
       );
       // console.log(res);
       if (res.data.code === 200) {
         this.auditData = res.data.data.items;
-        this.totalPages = res.data.data.items.length;
+        this.auditTotals  = res.data.data.items.length;
+      }
+    },
+    //获取承运商列表事件
+    async getCarrierList() {
+      let res = await this.$axios.get(
+        `sysUser/carrierList?currentPage=${this.carrierPage}&pageSize=10`
+      );
+      // console.log(res);
+      if (res.data.code === 200) {
+        this.carrierData = res.data.data.items;
+        this.carrierTotal = res.data.data.items.length;
+      }
+    },
+    //获取公司列表事件
+    async getCompanyList() {
+      let res = await this.$axios.get(
+        `sysUser/companyList?currentPage=${this.companyPage}&pageSize=10`
+      );
+      // console.log(res);
+      if (res.data.code === 200) {
+        this.companyData = res.data.data.items;
+        this.companyTotal = res.data.data.items.length;
       }
     },
     //tab栏切换事件
     async handleClick(tab) {
-      if (tab.name == "second") {
-        //获取承运商列表事件
-        let res = await this.$axios.get(
-          `sysUser/carrierList?currentPage=${this.currentPage}&pageSize=10`
-        );
-        // console.log(res);
-        if (res.data.code === 200) {
-          this.carrierData = res.data.data.items;
-          this.totalPages = res.data.data.items.length;
-        }
+      if (tab.name == "first") {
+        //获取货源列表
+        this.getAuditCheck();
       }
-
+      if (tab.name == "second") {
+        //获取承运商列表
+        this.getCarrierList();
+      }
       if (tab.name == "third") {
-        //获取公司列表事件
-        let res = await this.$axios.get(
-          `sysUser/companyList?currentPage=${this.currentPage}&pageSize=10`
-        );
-        // console.log(res);
-        if (res.data.code === 200) {
-          this.companyData = res.data.data.items;
-          this.totalPages = res.data.data.items.length;
-        }
+        //获取公司列表
+        this.getCompanyList();
       }
     },
     //获取RouteId事件
-    getRouteId(id){
-        this.checkList.routeId=id;
-        console.log(this.checkList.routeId);
-        this.auditVisible = true;
+    getRouteId(id) {
+      this.checkList.routeId = id;
+      console.log(this.checkList.routeId);
+      this.auditVisible = true;
     },
     //获取carrierId事件
-    getCarrierId(id){
-        this.carrierList.carrierId=id;
-        console.log(this.carrierList.carrierId);
-        this.carrierVisible = true;
+    getCarrierId(id) {
+      this.carrierList.carrierId = id;
+      console.log(this.carrierList.carrierId);
+      this.carrierVisible = true;
     },
-    //获取carrierId事件
-    
-    //货源审核事件
-    async auditCheck(){
-      if(this.auditForm.auditRadio == '2'){
-        this.checkList.routeState=2
-      }
+    //获取memberId事件
+    getMemberId(id) {
+      this.companyList.memberId = id;
+      this.companyVisible = true;
+    },
 
+    //货源审核事件
+    async auditCheck() {
+      if (this.auditForm.auditRadio == "2") {
+        this.checkList.routeState = 2;
+      }
       //拿到要传的参数
       //审核原因
-      this.checkList.routeCheckReason=this.auditForm.auditText;
+      this.checkList.routeCheckReason = this.auditForm.auditText;
       //审核人
-      this.checkList.routeCheckUser=window.sessionStorage.getItem("roleName");
+      this.checkList.routeCheckUser = window.sessionStorage.getItem("roleName");
       //审核指导价
-      this.checkList.routeCheckReason=this.auditForm.guidePrice;
+      this.checkList.routeCheckReason = this.auditForm.guidePrice;
 
       let res = await this.$axios.post("sysUser/checkRoute", this.checkList);
       console.log(res);
+      if (res.data.code == 200) {
+        this.getAuditCheck();
+      } else {
+        this.$message.error(res.data.message);
+      }
 
       this.auditVisible = false;
-      this.getAuditCheck();
     },
     //承运商审核事件
-    async carrierCheck(){
-      if(this.carrierForm.carrierRadio == '0'){
-        this.carrierList.carrierState=0
+    async carrierCheck() {
+      if (this.carrierForm.carrierRadio == "0") {
+        this.carrierList.carrierState = 0;
       }
 
       //拿到要传的参数
       //审核原因
-      this.carrierList.carrierCheck=this.carrierForm.carrierText;
-      
-      let res = await this.$axios.post("sysUser/carrierAudit", this.carrierList);
+      this.carrierList.carrierCheck = this.carrierForm.carrierText;
+
+      let res = await this.$axios.post(
+        "sysUser/carrierAudit",
+        this.carrierList
+      );
       console.log(res);
 
+      if (res.data.code == 200) {
+        this.getCarrierList();
+      } else {
+        this.$message.error(res.data.message);
+      }
       this.carrierVisible = false;
-      this.getAuditCheck();
     },
     //公司审核事件
-    async companyCheck(){
+    async companyCheck() {
+      //如果不通过,传状态为
+      if (this.companyForm.companyRadio == "0") {
+        this.companyList.memberState = 0;
+      }
+      //审核原因
+      this.companyList.check = this.companyForm.companyText;
 
+      let res = await this.$axios.post("sysUser/aduit", this.companyList);
+      console.log(res);
+      if (res.data.code == 200) {
+        this.getCompanyList();
+      } else {
+        this.$message.error(res.data.message);
+      }
+
+      this.carrierVisible = false;
     },
-    //页码改变事件
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+    //货源审核列表页码改变事件
+    auditPageChange() {
+      this.getAuditCheck();
+    },
+    //承运商审核列表页码改变事件
+    carrierPageChange() {
+      this.getCarrierList();
+    },
+    //公司审核列表页码改变事件
+    companyPageChange(){
+      this.getCompanyList();
     }
   },
   created() {
@@ -296,13 +404,14 @@ export default {
 
 <style lang="less">
 #auditList {
-  position: relative;
+  // position: relative;
   height: 100%;
   .my-page {
-    position: absolute;
-    left: 50%;
-    margin-left: -180px;
-    bottom: 60px;
+    // position: absolute;
+    // left: 50%;
+    // margin-left: -180px;
+    // bottom: 60px;
+    margin-top: 30px;
   }
 }
 </style>
