@@ -213,6 +213,8 @@ export default {
       if (res.data.code === 200) {
         this.tableData = res.data.data.list;
         this.totalPages = res.data.data.list.length;
+      }else{
+        this.$message.error(res.data.message);
       }
     },
     //多选框选择事件
@@ -249,6 +251,8 @@ export default {
       if (res.data.code === 200) {
         this.tableData = res.data.data.list;
         this.totalPages = res.data.data.list.length;
+      }else{
+        this.$message.error(res.data.message);
       }
     },
     //批量备注事件
@@ -270,6 +274,8 @@ export default {
 
       if (res.data.code === 200) {
         this.getCustomerLists();
+      } else{
+        this.$message.error(res.data.message);
       }
 
       this.dialogFormVisible = false;

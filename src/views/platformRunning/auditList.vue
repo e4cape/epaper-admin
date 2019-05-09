@@ -205,7 +205,7 @@ export default {
       companyTotal:0,
       //三个审核对话框的可见性
       auditVisible: false,
-      carrierVisible: false,
+      carrierVisible: false    ,
       companyVisible: false,
       auditForm: {
         auditRadio: "1",
@@ -238,9 +238,13 @@ export default {
       },
       //公司审核发请求的数据
       companyList: {
-        check: "",
+        memberCompany:{
+          check: "",
+          //2是开通,0是驳回
+          state:2
+        },
         memberId: 0,
-        memberState: 1
+       
       },
       //表单校验规则
       rules: {
@@ -366,12 +370,15 @@ export default {
     },
     //公司审核事件
     async companyCheck() {
-      //如果不通过,传状态为
+      //如果不通过,传状态为0
       if (this.companyForm.companyRadio == "0") {
-        this.companyList.memberState = 0;
+        this.companyList.memberCompany.state = 0;
       }
       //审核原因
-      this.companyList.check = this.companyForm.companyText;
+      this.companyList.memberCompany.check = this.companyForm.companyText;
+
+      //memberCompany要转成json字符串
+      this.companyList.memberCompany=JSON.stringify(this.companyList.memberCompany);
 
       let res = await this.$axios.post("sysUser/aduit", this.companyList);
       console.log(res);

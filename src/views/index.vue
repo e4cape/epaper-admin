@@ -6,10 +6,10 @@
       <!-- 头部 -->
       <el-header class="my-header">
         <el-row>
-          <el-col :span="20" class="header-title">
+          <el-col :span="21" class="header-title">
             <div>易纸通管理后台</div>
           </el-col>
-          <el-col :span="4" class="header-role">
+          <el-col :span="3" class="header-role">
             <div>
               <span>{{roleRemark}}</span> &nbsp;&nbsp;|&nbsp;&nbsp;
               <a href="#" @click="logout">退出</a>
@@ -121,6 +121,8 @@ export default {
         this.$message.success(res.data.message);
        // 删除token
       window.sessionStorage.removeItem("token");
+      window.sessionStorage.removeItem("roleName");
+      window.sessionStorage.removeItem("remark");
       // 编程式导航 去登录页
       this.$router.push("/login");
       } else {
@@ -136,7 +138,8 @@ export default {
         //显示右上角的角色名字
         this.roleRemark=res.data.data[0].remark;
         //同时将roleName存在sessionStorage中,方便其他页面调用
-        window.sessionStorage.setItem("roleName",res.data.data[0].roleName)
+        window.sessionStorage.setItem("roleName",res.data.data[0].roleName);
+        window.sessionStorage.setItem("remark",res.data.data[0].remark)
       }
   }
   
