@@ -1,6 +1,6 @@
 <template>
   <div id="role">
-    <el-button type="primary" @click="dialogFormVisible = true;">添加角色</el-button>
+    <el-button type="primary" @click="showAddRole">添加角色</el-button>
     <el-table
       ref="multipleTable"
       :data="tableData"
@@ -27,14 +27,14 @@
     </el-table>
 
     <!-- 分页器 -->
-    <el-pagination
+    <!-- <el-pagination
       @current-change="handleCurrentChange"
       :current-page="currentPage"
       layout="total, prev, pager, next, jumper"
       :total="totalPages"
       background
       class="my-page"
-    ></el-pagination>
+    ></el-pagination>-->
 
     <!-- 添加角色对话框 -->
     <el-dialog title="添加角色" :visible.sync="dialogFormVisible" width="320px">
@@ -67,6 +67,24 @@
         <el-button type="primary" @click="updateRole">确认添加</el-button>
       </div>
     </el-dialog>
+
+    <!-- 树形菜单对话框 -->
+    <el-dialog title="分配权限" :visible.sync="treeVisible" width="420px">
+      <el-tree
+        :data="rightList"
+        show-checkbox
+        node-key="id"
+        default-expand-all
+        :default-checked-keys="checkedKeys"
+        :props="defaultProps"
+        ref="tree"
+      ></el-tree>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="treeVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitRole">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -86,10 +104,11 @@ export default {
       //对话框的可见性
       dialogFormVisible: false,
       editVisible: false,
+      treeVisible: false,
       //当前页码
-      currentPage: 1,
-      pageSize: 10,
-      totalPages: 0,
+      // currentPage: 1,
+      // pageSize: 10,
+      // totalPages: 0,
       //添加角色弹出框的表单
       form: {
         roleName: "",
@@ -101,6 +120,112 @@ export default {
         roleName: "",
         remark: ""
       },
+      // 树形菜单的数据
+      rightList: [
+        {
+          id: 1,
+          authName: "控制台",
+          children: [
+            {
+              id: 2,
+              authName: "数据分析"
+            },
+            {
+              id: 3,
+              authName: "平台流水"
+            },
+            {
+              id: 4,
+              authName: "平台设置"
+            }
+          ]
+        },
+        {
+          id: 5,
+          authName: "订单管理",
+          children: [
+            {
+              id: 6,
+              authName: "商城订单"
+            },
+            {
+              id: 7,
+              authName: "货源列表"
+            }
+          ]
+        },
+        {
+          id: 8,
+          authName: "客户管理",
+          children: [
+            {
+              id: 9,
+              authName: "会员列表"
+            },
+            {
+              id: 10,
+              authName: "商家列表"
+            },
+            {
+              id: 11,
+              authName: "平台店铺"
+            }
+          ]
+        },
+        {
+          id: 12,
+          authName: "平台运营",
+          children: [
+            {
+              id: 13,
+              authName: "管理员"
+            },
+            {
+              id: 14,
+              authName: "角色"
+            },
+            {
+              id: 15,
+              authName: "广告图"
+            },
+            {
+              id: 16,
+              authName: "文章列表"
+            },
+            {
+              id: 17,
+              authName: "文章分类"
+            },
+            {
+              id: 18,
+              authName: "审核列表"
+            }
+          ]
+        },
+        {
+          id: 19,
+          authName: "商品管理",
+          children: [
+            {
+              id: 20,
+              authName: "商家商品"
+            },
+            {
+              id:21,
+              authName: "活动商品"
+            }
+          ]
+        },
+
+      ],
+      //树形菜单的设置
+      defaultProps: {
+        children: "children",
+        label: "authName"
+      },
+      //选中的选项
+      checkedKeys: [],
+
       formLabelWidth: "80px"
     };
   },
@@ -115,6 +240,12 @@ export default {
       } else {
         this.$message.error(res.data.message);
       }
+    },
+    //显示添加角色的对话框
+    showAddRole() {
+      this.form.roleName = "";
+      this.form.remark = "";
+      this.dialogFormVisible = true;
     },
     //编辑角色的事件
     async editRole(id) {
@@ -207,8 +338,40 @@ export default {
           });
         });
     },
+    //设置权限展示权限树形菜单事件
+    async setRights(id) {
+      let res = await this.$axios.get(
+        `sysMenu/selectRoleId?roleId=${id}&token=${window.sessionStorage.getItem("token")}`
+      );
+      console.log(res);
+      if (res.data.code === 200) {
+        let rightsArray=res.data.data;
+        //声明一个空数组,存放被选中的id
+        let checkedRight=[];
+        for(var i=0;i<rightsArray.length;i++) {
+          if(rightsArray[i].checked=='true'){
+            checkedRight.push(rightsArray[i].menuId);
+          }
+        }
+        this.checkedKeys=checkedRight;
+        console.log(checkedRight);
+        
+      } else {
+        this.$message.error(res.data.message);
+      }
+
+      this.treeVisible = true;
+
+    },
+    //提交权限
+    submitRole() {
+
+      this.treeVisible = false;
+    },
     //页码切换
-    handleCurrentChange() {}
+    handleCurrentChange() {
+      this.getRoleList();
+    }
   },
   created() {
     this.getRoleList();
