@@ -14,7 +14,7 @@
       <el-table-column prop="remark" label="备注" width align="center"></el-table-column>
       <el-table-column prop="roleId" label="操作" show-overflow-tooltip width align="center">
         <template slot-scope="scope">
-          <el-link type="primary" :underline="false" @click="setRights(scope.row.roleId)">设置权限</el-link>
+          <el-link type="primary" :underline="false" @click="setRights(scope.row)">设置权限</el-link>
           <el-link
             type="primary"
             :underline="false"
@@ -120,6 +120,8 @@ export default {
         roleName: "",
         remark: ""
       },
+      //正在编辑的角色
+      editingRole: {},
       // 树形菜单的数据
       rightList: [
         {
@@ -211,12 +213,11 @@ export default {
               authName: "商家商品"
             },
             {
-              id:21,
+              id: 21,
               authName: "活动商品"
             }
           ]
-        },
-
+        }
       ],
       //树形菜单的设置
       defaultProps: {
@@ -267,11 +268,6 @@ export default {
               this.editForm.remark = res.data.data[j].remark;
           }
         }
-        // for (var i = 0; i < res.data.data.length; i++) {
-        //   //判断Id,拿到该角色的信息
-        //   if (id === res.data.data[i].roleId)
-        //   this.editForm.remark = res.data.data[i].remark;
-        // }
       } else {
         this.$message.error(res.data.message);
       }
@@ -339,32 +335,60 @@ export default {
         });
     },
     //设置权限展示权限树形菜单事件
-    async setRights(id) {
+    async setRights(row) {
+      //如果弹框存在,就清空权限选择项
+      if (this.$refs.tree) {
+        this.$refs.tree.setCheckedKeys([]);
+      }
+
       let res = await this.$axios.get(
-        `sysMenu/selectRoleId?roleId=${id}&token=${window.sessionStorage.getItem("token")}`
+        `sysMenu/selectRoleId?roleId=${
+          row.roleId
+        }&token=${window.sessionStorage.getItem("token")}`
       );
       console.log(res);
       if (res.data.code === 200) {
-        let rightsArray=res.data.data;
+        let rightsArray = res.data.data;
         //声明一个空数组,存放被选中的id
-        let checkedRight=[];
-        for(var i=0;i<rightsArray.length;i++) {
-          if(rightsArray[i].checked=='true'){
+        let checkedRight = [];
+        for (var i = 0; i < rightsArray.length; i++) {
+          if (rightsArray[i].checked == "true") {
             checkedRight.push(rightsArray[i].menuId);
           }
         }
-        this.checkedKeys=checkedRight;
+        this.checkedKeys = checkedRight;
         console.log(checkedRight);
-        
       } else {
         this.$message.error(res.data.message);
       }
 
       this.treeVisible = true;
-
+      //保存编辑的角色
+      this.editingRole = row;
+      console.log(this.editingRole);
     },
     //提交权限
-    submitRole() {
+    async submitRole() {
+      // 获取选中的ids
+      let roleIds = this.$refs.tree.getCheckedKeys().join(",");
+      console.log(roleIds);
+
+      // 调用接口
+      let res = await this.$axios.post(`sysMenu/addRoleMenu?`, {
+        menuIdList: roleIds,
+        roleId: this.editingRole.roleId,
+        token: window.sessionStorage.getItem("token")
+      });
+      if (res.data.code === 200) {
+        // 重新获取角色数据
+        this.getRoleList();
+        this.$message.success(res.data.message);
+      } else {
+        this.$message.error(res.data.message);
+      }
+
+      //每次设置完权限后清空权限选择框
+      this.$refs.tree.setCheckedKeys([]);
 
       this.treeVisible = false;
     },
