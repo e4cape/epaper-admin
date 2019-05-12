@@ -131,6 +131,9 @@ export default {
     }
   },
   async created(){
+      
+      window.sessionStorage.removeItem("remark");
+
       //查询角色的接口
       let res = await this.$axios.get(`sysRole/selectRole?token=${window.sessionStorage.getItem("token")}`);
       console.log(res);
