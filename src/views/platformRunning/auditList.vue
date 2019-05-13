@@ -259,7 +259,7 @@ export default {
     //获取货源审核列表事件
     async getAuditCheck() {
       let res = await this.$axios.get(
-        `sysUser/pageList?currentPage=${this.auditPage}&pageSize=10`
+        `admin/sysUser/pageList?currentPage=${this.auditPage}&pageSize=10`
       );
       // console.log(res);
       if (res.data.code === 200) {
@@ -270,7 +270,7 @@ export default {
     //获取承运商列表事件
     async getCarrierList() {
       let res = await this.$axios.get(
-        `sysUser/carrierList?currentPage=${this.carrierPage}&pageSize=10`
+        `admin/sysUser/carrierList?currentPage=${this.carrierPage}&pageSize=10`
       );
       // console.log(res);
       if (res.data.code === 200) {
@@ -281,7 +281,7 @@ export default {
     //获取公司列表事件
     async getCompanyList() {
       let res = await this.$axios.get(
-        `sysUser/companyList?currentPage=${this.companyPage}&pageSize=10`
+        `admin/sysUser/companyList?currentPage=${this.companyPage}&pageSize=10`
       );
       // console.log(res);
       if (res.data.code === 200) {
@@ -335,7 +335,7 @@ export default {
       //审核指导价
       this.checkList.routeCheckReason = this.auditForm.guidePrice;
 
-      let res = await this.$axios.post("sysUser/checkRoute", this.checkList);
+      let res = await this.$axios.post("admin/sysUser/checkRoute", this.checkList);
       console.log(res);
       if (res.data.code == 200) {
         this.getAuditCheck();
@@ -356,7 +356,7 @@ export default {
       this.carrierList.carrierCheck = this.carrierForm.carrierText;
 
       let res = await this.$axios.post(
-        "sysUser/carrierAudit",
+        "admin/sysUser/carrierAudit",
         this.carrierList
       );
       console.log(res);
@@ -380,7 +380,7 @@ export default {
       //memberCompany要转成json字符串
       this.companyList.memberCompany=JSON.stringify(this.companyList.memberCompany);
 
-      let res = await this.$axios.post("sysUser/aduit", this.companyList);
+      let res = await this.$axios.post("admin/sysUser/aduit", this.companyList);
       console.log(res);
       if (res.data.code == 200) {
         this.getCompanyList();

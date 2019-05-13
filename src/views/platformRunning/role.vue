@@ -233,7 +233,7 @@ export default {
   methods: {
     //查询角色列表的事件
     async getRoleList() {
-      let res = await this.$axios.get(`sysRole/selectRole`);
+      let res = await this.$axios.get(`admin/sysRole/selectRole`);
       console.log(res);
       if (res.data.code === 200) {
         this.tableData = res.data.data;
@@ -254,7 +254,7 @@ export default {
       this.editForm.roleId = id;
 
       //参数是每一行的roleId
-      let res = await this.$axios.get(`sysRole/selectRole`);
+      let res = await this.$axios.get(`admin/sysRole/selectRole`);
       if (res.data.code === 200) {
         console.log(res.data.data);
         console.log(id);
@@ -278,7 +278,7 @@ export default {
     async addRole() {
       //添加角色必须带token
       let res = await this.$axios.post(
-        `sysRole/addRole?token=${window.sessionStorage.getItem("token")}`,
+        `admin/sysRole/addRole?token=${window.sessionStorage.getItem("token")}`,
         this.form
       );
       if (res.data.code === 200) {
@@ -292,7 +292,7 @@ export default {
     //编辑更新角色的事件
     async updateRole() {
       let res = await this.$axios.post(
-        `sysRole/updateRole?token=${window.sessionStorage.getItem("token")}`,
+        `admin/sysRole/updateRole?token=${window.sessionStorage.getItem("token")}`,
         this.editForm
       );
       if (res.data.code === 200) {
@@ -314,7 +314,7 @@ export default {
         .then(async () => {
           //调删除接口
           let res = await this.$axios.post(
-            `sysRole/delMenu?token=${window.sessionStorage.getItem("token")}`,
+            `admin/sysRole/delMenu?token=${window.sessionStorage.getItem("token")}`,
             { roleId: id }
           );
           if (res.data.code === 200) {
@@ -342,7 +342,7 @@ export default {
       }
 
       let res = await this.$axios.get(
-        `sysMenu/selectRoleId?roleId=${
+        `admin/sysMenu/selectRoleId?roleId=${
           row.roleId
         }&token=${window.sessionStorage.getItem("token")}`
       );
@@ -374,7 +374,7 @@ export default {
       console.log(roleIds);
 
       // 调用接口
-      let res = await this.$axios.post(`sysMenu/addRoleMenu?`, {
+      let res = await this.$axios.post(`admin/sysMenu/addRoleMenu?`, {
         menuIdList: roleIds,
         roleId: this.editingRole.roleId,
         token: window.sessionStorage.getItem("token")

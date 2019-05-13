@@ -155,7 +155,7 @@ export default {
     //获取管理员列表的事件
     async getManagerList() {
       let res = await this.$axios.get(
-        `sysUser/sysUserList?currentPage=${
+        `admin/sysUser/sysUserList?currentPage=${
           this.currentPage
         }&pageSize=10&status=${this.formInline.state}&username=${
           this.formInline.account
@@ -177,7 +177,7 @@ export default {
     },
     //角色下拉框获取角色的事件
     async getRoleList() {
-      let res = await this.$axios.get(`sysRole/selectRole`);
+      let res = await this.$axios.get(`admin/sysRole/selectRole`);
       console.log(res);
       if (res.data.code === 200) {
         res.data.data.forEach(v => {
@@ -193,7 +193,7 @@ export default {
     //添加账号的事件
     async addAccount() {
       //添加账号的接口
-      let res = await this.$axios.post(`sysUser/addSysUser`, this.form);
+      let res = await this.$axios.post(`admin/sysUser/addSysUser`, this.form);
       if (res.data.code == 200) {
         this.$message.success(res.data.message);
         this.getManagerList();
@@ -209,7 +209,7 @@ export default {
       //如果账号目前是关闭状态,就要开启它
       row.status == 0 ? (myStatus = 1) : (myStatus = 0);
 
-      let res = await this.$axios.post(`sysUser/addSysUsers`, {
+      let res = await this.$axios.post(`admin/sysUser/addSysUsers`, {
         userId: row.userId,
         status: myStatus
       });
@@ -230,7 +230,7 @@ export default {
         .then(async () => {
           //调删除接口
           let res = await this.$axios.get(
-            `sysUser/delSysUser?userId=${row.userId}`
+            `admin/sysUser/delSysUser?userId=${row.userId}`
           );
           if (res.data.code === 200) {
             this.$message({

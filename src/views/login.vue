@@ -75,7 +75,7 @@ export default {
       this.$refs[formName].validate(async valid => {
         if (valid) {
           // 成功 提交数据
-          let res = await this.$axios.post("sysUser/login", this.loginForm);
+          let res = await this.$axios.post("admin/sysUser/login", this.loginForm);
           console.log(res);
           //另外一种封装的api
           // let res = await Login.login(this.loginForm)

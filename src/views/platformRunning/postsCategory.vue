@@ -74,7 +74,7 @@ export default {
     //获取分类列表的接口
     async getCate() {
       let res = await this.$axios.get(
-        `informationController/queryArticleCatelog?currentPage=${
+        `admin/informationController/queryArticleCatelog?currentPage=${
           this.currentPage
         }&pageSize=10`
       );
@@ -105,7 +105,7 @@ export default {
     //更新分类
     async updateCate(){
       let res = await this.$axios.post(
-        `informationController/updateArticleCatelog`,
+        `admin/informationController/updateArticleCatelog`,
         { acId:this.editId,acName: this.editForm.cateName }
       );
       console.log(res);
@@ -120,7 +120,7 @@ export default {
     //添加分类的接口
     async addCate() {
       let res = await this.$axios.post(
-        `informationController/addArticleCatelog`,
+        `admin/informationController/addArticleCatelog`,
         { acName: this.form.cateName }
       );
       console.log(res);
@@ -141,7 +141,7 @@ export default {
       })
         .then(async () => {
           //调删除接口
-          let res = await this.$axios.post(`informationController/delArticleCatelog`,{acId:row.acId});
+          let res = await this.$axios.post(`admin/informationController/delArticleCatelog`,{acId:row.acId});
           if (res.data.code === 200) {
             this.$message({
               type: "success",

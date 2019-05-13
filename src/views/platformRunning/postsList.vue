@@ -198,7 +198,7 @@ export default {
     //获取文章列表
     async getPostList() {
       let res = await this.$axios.get(
-        `informationController/sysArticleList?currentPage=${
+        `admin/informationController/sysArticleList?currentPage=${
           this.currentPage
         }&pageSize=10&articleTitle=${this.formInline.postsName}&articleState=${
           this.formInline.state
@@ -216,7 +216,7 @@ export default {
     //获取文章分类
     async getCate() {
       let res = await this.$axios.get(
-        `informationController/queryArticleCatelog?currentPage=${
+        `admin/informationController/queryArticleCatelog?currentPage=${
           this.currentPage
         }&pageSize=10`
       );
@@ -240,7 +240,7 @@ export default {
     },
     //发布文章
     async publishPost() {
-      let res = await this.$axios.post(`informationController/sysArticleAdd`, {
+      let res = await this.$axios.post(`admin/informationController/sysArticleAdd`, {
         articleCateId: this.form.postCate,
         articleContent: this.form.textarea,
         articleTitle: this.form.postName
@@ -269,7 +269,7 @@ export default {
     },
     //修改文章
     async amendPost() {
-      let res = await this.$axios.post(`informationController/sysArticleUpdate`, {
+      let res = await this.$axios.post(`admin/informationController/sysArticleUpdate`, {
         articleId:this.editForm.articleId,
         articleCateId: this.editForm.postCate,
         articleContent: this.editForm.textarea,
@@ -295,7 +295,7 @@ export default {
       })
         .then(async () => {
           //调删除接口
-          let res = await this.$axios.post(`informationController/sysArticleDel`,{articleId:row.articleId});
+          let res = await this.$axios.post(`admin/informationController/sysArticleDel`,{articleId:row.articleId});
           if (res.data.code === 200) {
             this.$message({
               type: "success",
@@ -320,7 +320,7 @@ export default {
         if(row.articleState==1){
           state=0;
         }
-        let res = await this.$axios.post(`informationController/sysArticleUpdate`, {
+        let res = await this.$axios.post(`admin/informationController/sysArticleUpdate`, {
         articleId:row.articleId,
         articleState:state
       });

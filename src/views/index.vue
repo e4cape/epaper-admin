@@ -114,7 +114,7 @@ export default {
     async logout(){
        console.log('点退出了');
       console.log(window.sessionStorage.getItem("token"));
-      let res = await this.$axios.get(`sysUser/logout?token=${window.sessionStorage.getItem("token")}`);
+      let res = await this.$axios.get(`admin/sysUser/logout?token=${window.sessionStorage.getItem("token")}`);
       console.log(res);
       
       if (res.data.code === 200) {
@@ -135,7 +135,7 @@ export default {
       window.sessionStorage.removeItem("remark");
 
       //查询角色的接口
-      let res = await this.$axios.get(`sysRole/selectRole?token=${window.sessionStorage.getItem("token")}`);
+      let res = await this.$axios.get(`admin/sysRole/selectRole?token=${window.sessionStorage.getItem("token")}`);
       console.log(res);
       if (res.data.code === 200) {
         //显示右上角的角色名字

@@ -9,7 +9,7 @@ import { Message } from "element-ui";
 export default {
   install(Vue) {
     //设置基地址
-    axios.defaults.baseURL = "https://szyizhitong.cn/admin";
+    axios.defaults.baseURL = "https://szyizhitong.cn";
     // axios.defaults.baseURL = "https://120.79.166.12";
 
     // 设置axios拦截器

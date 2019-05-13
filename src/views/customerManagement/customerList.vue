@@ -198,7 +198,7 @@ export default {
     //查询事件
     async search() {
       let res = await this.$axios.get(
-        `sysUser/memberLists?currentPage=1&pageSize=10&account=${
+        `admin/sysUser/memberLists?currentPage=1&pageSize=10&account=${
           this.formInline.account
         }&phone=${this.formInline.phoneNum}&source=${this.formInline.source}
         &carrierType=${this.formInline.isCarrier}&memberType=${
@@ -245,7 +245,7 @@ export default {
     //获取会员列表
     async getCustomerLists() {
       let res = await this.$axios.get(
-        `sysUser/memberLists?currentPage=${this.currentPage}&pageSize=10`
+        `admin/sysUser/memberLists?currentPage=${this.currentPage}&pageSize=10`
       );
       console.log(res);
       if (res.data.code === 200) {
@@ -269,7 +269,7 @@ export default {
         });
       }
 
-      let res = await this.$axios.post(`sysUser/memberRemark`, newSelection);
+      let res = await this.$axios.post(`admin/sysUser/memberRemark`, newSelection);
       console.log(res);
 
       if (res.data.code === 200) {
