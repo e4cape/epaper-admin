@@ -4,10 +4,10 @@
     <div class="search">
       <el-form :inline="true" :model="formInline">
         <el-form-item label="账号名" class="inputForm">
-          <el-input v-model="formInline.account" placeholder="请输入会员账号" class="my-input"></el-input>
+          <el-input v-model="formInline.account" placeholder="请输入会员账号" ></el-input>
         </el-form-item>
         <el-form-item label="角色" class="inputForm">
-          <el-select v-model="formInline.role" placeholder="请选择角色" class="my-input">
+          <el-select v-model="formInline.role" placeholder="请选择角色" >
             <el-option
               :label="item.role"
               :value="item.role"
@@ -17,7 +17,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="状态" class="inputForm">
-          <el-select v-model="formInline.state" placeholder="请选择状态" class="my-input">
+          <el-select v-model="formInline.state" placeholder="请选择状态" >
             <el-option label="已开启" value="1"></el-option>
             <el-option label="已关闭" value="0"></el-option>
           </el-select>
