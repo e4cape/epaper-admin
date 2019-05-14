@@ -40,7 +40,7 @@ export default {
     //     ) {
     //       // 打会登录页
     //       Vue.prototype.$message.warning(
-    //         "哥们 ，伪造token哦，牛逼！滚去登录页"
+    //         "伪造token,即将跳转到登录页!"
     //       );
     //       // 删除伪造的token
     //       window.sessionStorage.removeItem("token");

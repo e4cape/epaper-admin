@@ -189,33 +189,14 @@ export default {
       this.formInline.account = "";
       this.formInline.phoneNum = "";
       this.formInline.source = "";
-      // console.log(this.formInline.source);
       this.formInline.isCom = "";
       this.formInline.isCarrier = "";
-      this.formInline.dataValue = [,];
-      // console.log(this.formInline.dataValue[0],this.formInline.dataValue[1]);
+      this.formInline.dataValue = [];
+      this.getCustomerLists();
     },
     //查询事件
-    async search() {
-      let res = await this.$axios.get(
-        `admin/sysUser/memberLists?currentPage=1&pageSize=10&account=${
-          this.formInline.account
-        }&phone=${this.formInline.phoneNum}&source=${this.formInline.source}
-        &carrierType=${this.formInline.isCarrier}&memberType=${
-          this.formInline.isCom
-        }&startTime=${this.formInline.dataValue[0] || ""}&endTime=${this
-          .formInline.dataValue[1] || ""}
-        `
-      );
-      console.log(this.formInline.source);
-      console.log(this.formInline.isCarrier);
-      console.log(res);
-      if (res.data.code === 200) {
-        this.tableData = res.data.data.list;
-        this.totalPages = res.data.data.list.length;
-      }else{
-        this.$message.error(res.data.message);
-      }
+    search() {
+      this.getCustomerLists();
     },
     //多选框选择事件
     handleSelectionChange(val) {
@@ -245,7 +226,13 @@ export default {
     //获取会员列表
     async getCustomerLists() {
       let res = await this.$axios.get(
-        `admin/sysUser/memberLists?currentPage=${this.currentPage}&pageSize=10`
+        `admin/sysUser/memberLists?currentPage=${this.currentPage}&pageSize=10&account=${
+          this.formInline.account
+        }&phone=${this.formInline.phoneNum}&source=${this.formInline.source}
+        &carrierType=${this.formInline.isCarrier}&memberType=${
+          this.formInline.isCom
+        }&startTime=${this.formInline.dataValue[0] || ""}&endTime=${this
+          .formInline.dataValue[1] || ""}`
       );
       console.log(res);
       if (res.data.code === 200) {
@@ -283,9 +270,6 @@ export default {
   },
   created() {
     this.getCustomerLists();
-  },
-  mounted() {
-    // console.log('页面刷新了');
   },
   //过滤器
   filters: {

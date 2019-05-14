@@ -2,7 +2,7 @@
   <div id="ads">
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
       <el-tab-pane label="PC端" name="first">
-        <el-table :data="tableData" border style="width: 100%">
+        <el-table :data="PCtableData" border style="width: 100%">
           <el-table-column prop="bannerLocation" label="横幅位置" align="center">
             <template slot-scope="scope">
               <el-link :underline="false" v-if="scope.row.bannerLocation==1">首页banner</el-link>
@@ -34,7 +34,7 @@
 
 
       <el-tab-pane label="小程序" name="second">
-        <el-table :data="tableData" border style="width: 100%">
+        <el-table :data="MPtableData" border style="width: 100%">
           <el-table-column prop="bannerLocation" label="横幅位置" align="center">
             <template slot-scope="scope">
               <el-link :underline="false" v-if="scope.row.bannerLocation==1">首页banner</el-link>
@@ -74,11 +74,12 @@ export default {
   data() {
     return {
       activeName: "first",
-      tableData: [],
+      //pc列表数据
+      PCtableData: [],
+      //小程序列表数据
+      MPtableData:[],
       //图片上传的地址
       uploadAction: "https://szyizhitong.cn:443/basics/goods/good/uploadimg",
-      //更换图片后的新地址
-      newImgUrl:'',
       //编辑的那一行广告图
       editAd:{
         bannerId:0,
@@ -89,11 +90,22 @@ export default {
   methods: {
     //获取广告图列表
     async getAdList() {
+      //每次获取前都要清空数组
+      this.PCtableData=[];
+      this.MPtableData=[];
+
       let res = await this.$axios.get(`basics/banner/queryBanner`);
       console.log(res);
       if (res.data.code === 200) {
-        this.tableData = res.data.data;
-        console.log(this.tableData);
+        
+        res.data.data.forEach(v=>{
+          //获取到pc的banner图
+          if(v.bannerSource==1){
+            this.PCtableData.push(v)
+          }else {
+             this.MPtableData.push(v)
+          }
+        })
       } else {
         this.$message.error(res.data.message);
       }
