@@ -58,6 +58,7 @@
               <el-menu-item-group>
                 <el-menu-item index="customerList">会员列表</el-menu-item>
                 <el-menu-item index="merchant">商家列表</el-menu-item>
+                <el-menu-item index="shop">平台店铺</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="4">

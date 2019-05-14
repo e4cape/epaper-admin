@@ -20,6 +20,7 @@ const supplyGoods = () => import("../views/orderManagement/supplyGoods.vue");
 //客户管理模块
 const customerList = () => import("../views/customerManagement/customerList.vue");
 const merchant = () => import("../views/customerManagement/merchant.vue");
+const shop = () => import("../views/customerManagement/shop.vue");
 
 
 //平台运营模块
@@ -93,6 +94,11 @@ let routes = [
         {
             path:'merchant',
             component:merchant
+        },
+        //平台店铺
+        {
+            path:'shop',
+            component:shop
         },
 
 
