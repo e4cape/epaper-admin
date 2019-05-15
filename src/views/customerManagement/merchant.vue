@@ -10,10 +10,10 @@
           <el-input v-model="formInline.contactsPhone" placeholder="请输入手机号" style="width:140px"></el-input>
         </el-form-item>
         <el-form-item label="主营品类" class="inputForm">
-          <el-select v-model="formInline.cateId" placeholder="请选择主营品类">
+          <el-select v-model="formInline.cateName" placeholder="请选择主营品类">
             <el-option
               :label="item.cateName"
-              :value="item.cateId"
+              :value="item.cateName"
               v-for="(item,index) in cateList"
               :key="index"
             ></el-option>
@@ -67,11 +67,11 @@
         <el-table-column prop="cateName" label="主营品类" align="center" width="200"></el-table-column>
         <el-table-column prop="storeState" label="状态" align="center" width="200">
           <template slot-scope="scope">
-            <el-link type="primary" :underline="false" v-if="scope.row.storeState==1">开启</el-link>
+            <el-link :underline="false" v-if="scope.row.storeState==1">开启</el-link>
             <el-link type="danger" :underline="false" v-else>关闭</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop label="商家备注" align="center"></el-table-column>
+        <el-table-column prop="remark" label="商家备注" align="center"></el-table-column>
         <el-table-column porp="storeState" label="操作" align="center">
           <template slot-scope="scope">
             <el-link type="primary" :underline="false" @click="remark(scope.row)">备注</el-link>
@@ -90,10 +90,10 @@
             <el-link
               type="primary"
               :underline="false"
-              @click="close(scope.row)"
+              @click="openAndClose(scope.row)"
               v-if="scope.row.storeState==1"
             >关闭</el-link>
-            <el-link type="danger" :underline="false" @click="open(scope.row)" v-else>开启</el-link>
+            <el-link type="danger" :underline="false" @click="openAndClose(scope.row)" v-else>开启</el-link>
           </template>
         </el-table-column>
       </el-table>
@@ -116,12 +116,12 @@
           <el-input v-model="openForm.storeName" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="店铺描述" :label-width="formLabelWidth">
-          <el-input v-model="openForm.desc" type="textarea" :rows="6" placeholder="请输入内容"></el-input>
+          <el-input v-model="openForm.storeIntroduce" type="textarea" :rows="6" placeholder="请输入内容"></el-input>
         </el-form-item>
         <el-form-item label="店铺logo" label-width="100px">
           <el-upload
             class="logo-uploader"
-            :action="logoAction"
+            :action="Action"
             :on-success="handleLogoSuccess"
             :before-upload="beforeLogoUpload"
           >
@@ -132,7 +132,7 @@
         <el-form-item label="店铺banner" label-width="100px">
           <el-upload
             class="banner-uploader"
-            :action="bannerAction"
+            :action="Action"
             :on-success="handleBannerSuccess"
             :before-upload="beforeBannerUpload"
           >
@@ -162,50 +162,103 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="openVisible = false">取消</el-button>
-        <el-button type="primary" @click="openShop">确认发布</el-button>
+        <el-button type="primary" @click="confirmOpenShop">确认开通</el-button>
       </div>
     </el-dialog>
 
     <!-- 编辑店铺对话框 -->
-    <el-dialog title="编辑文章" :visible.sync="editVisible" width="550px">
-      <el-form :model="editForm"></el-form>
+    <el-dialog title="编辑文章" :visible.sync="editVisible" width="400px">
+      <el-form :model="editForm">
+        <el-form-item label="店铺名称" :label-width="formLabelWidth">
+          <el-input v-model="editForm.storeName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="店铺描述" :label-width="formLabelWidth">
+          <el-input v-model="editForm.storeIntroduce" type="textarea" :rows="6" placeholder="请输入内容"></el-input>
+        </el-form-item>
+        <el-form-item label="店铺logo" label-width="100px">
+          <el-upload
+            class="logo-uploader"
+            :action="Action"
+            :on-success="handleLogoSuccess"
+            :before-upload="beforeLogoUpload"
+          >
+            <img v-if="logoImageUrl" :src="logoImageUrl" class="logo">
+            <i v-else class="el-icon-plus logo-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="店铺banner" label-width="100px">
+          <el-upload
+            class="banner-uploader"
+            :action="Action"
+            :on-success="handleBannerSuccess"
+            :before-upload="beforeBannerUpload"
+          >
+            <img v-if="bannerImageUrl" :src="bannerImageUrl" class="banner">
+            <i v-else class="el-icon-plus banner-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="主营品类" :label-width="formLabelWidth">
+          <el-select v-model="editForm.cateId" placeholder="请选择分类">
+            <el-option
+              :label="item.cateName"
+              :value="item.cateId"
+              v-for="(item,index) in cateList"
+              :key="index"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="联系人" :label-width="formLabelWidth">
+          <el-input v-model="editForm.contactsName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="联系电话" :label-width="formLabelWidth">
+          <el-input v-model="editForm.contactsPhone" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="公司地址" :label-width="formLabelWidth">
+          <el-input v-model="editForm.address" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="editVisible = false">取消</el-button>
-        <el-button type="primary" @click="editShop">确认发布</el-button>
+        <el-button type="primary" @click="confirmEditShop">确认发布</el-button>
       </div>
     </el-dialog>
 
     <!-- 政策对话框 -->
-    <el-dialog title="商家政策" :visible.sync="policyVisible" width="550px">
+    <el-dialog title="商家政策" :visible.sync="policyVisible">
       <el-form :model="policyForm">
         <el-form-item label="促销政策" label-width="100px">
-          <el-upload
-            class="logo-uploader"
-            :action="logoAction"
-            :on-success="handleLogoSuccess"
-            :before-upload="beforeLogoUpload"
-          >
-            <img v-if="logoImageUrl" :src="logoImageUrl" class="logo">
-            <i v-else class="el-icon-plus logo-uploader-icon"></i>
-            <!-- <el-link type="primary" :underline="false" @click="addNew">新增</el-link> -->
+          <el-upload :action="Action" list-type="picture-card" :on-success="handlePolicy">
+            <i class="el-icon-plus"></i>
           </el-upload>
+          <!-- <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt>
+          </el-dialog> -->
         </el-form-item>
         <el-form-item label="质量指标" label-width="100px">
-          <el-upload
-            class="logo-uploader"
-            :action="logoAction"
-            :on-success="handleLogoSuccess"
-            :before-upload="beforeLogoUpload"
-          >
-            <img v-if="logoImageUrl" :src="logoImageUrl" class="logo">
-            <i v-else class="el-icon-plus logo-uploader-icon"></i>
-            <!-- <el-link type="primary" :underline="false" @click="addNew">新增</el-link> -->
+          <el-upload :action="Action" list-type="picture-card" :on-success="handleQuality">
+            <i class="el-icon-plus"></i>
           </el-upload>
+          <!-- <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt>
+          </el-dialog> -->
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="policyVisible = false">取消</el-button>
         <el-button type="primary" @click="savePolicy">保存</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 备注对话框 -->
+    <el-dialog title="店铺备注" :visible.sync="remarkVisible" width="400px">
+      <el-form :model="remarkForm">
+        <el-form-item label="店铺备注" label-width="100px">
+          <el-input v-model="remarkForm.remark" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="remarkVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveRemark">保存</el-button>
       </div>
     </el-dialog>
   </div>
@@ -230,31 +283,60 @@ export default {
       openVisible: false,
       editVisible: false,
       policyVisible: false,
+      remarkVisible: false,
       //表格数据
       tableData: [],
 
-      //对话框
+      //开通店铺的表单
       openForm: {
         storeName: "",
-        desc: "",
+        storeIntroduce: "",
+        storeLogo: "",
+        storeBanner: "",
         cateId: "",
         contactsName: "",
         contactsPhone: "",
         address: ""
       },
-      editForm: {},
-      policyForm: {},
+      //编辑店铺的表单
+      editForm: {
+        storeName: "",
+        storeIntroduce: "",
+        storeLogo: "",
+        storeBanner: "",
+        cateId: "",
+        contactsName: "",
+        contactsPhone: "",
+        address: ""
+      },
+      //政策的表单
+      policyForm: {
+        storeId: "",
+        storeNorm: "",
+        storePromote: ""
+      },
+      remarkForm: {
+        remark: "",
+        storeId: ""
+      },
 
-      //上传头像的
-      //上传地址
-      logoAction: "",
-      bannerAction: "",
-      //上传图片
+      //图片上传地址
+      Action: "https://szyizhitong.com:443/basics/goods/good/uploadimg",
+
+      //上传图片后返回的地址
       bannerImageUrl: "",
       logoImageUrl: "",
       formLabelWidth: "80px",
 
-      cateList: []
+      cateList: [],
+
+      //政策中的图片上传
+      // dialogImageUrl: "",
+      // dialogVisible: false
+
+      //存放上传政策图片路径的数组
+      imgArr1:[],
+      imgArr2:[],
     };
   },
   methods: {
@@ -273,11 +355,11 @@ export default {
       console.log(res);
       if (res.data.code === 200) {
         //店铺类型为1就是商家店铺
-        this.tableData = res.data.data.list.filter(v=>{
-            if(v.storeType==1) {
-              return v;
-            }
-        })
+        this.tableData = res.data.data.list.filter(v => {
+          if (v.storeType == 1) {
+            return v;
+          }
+        });
         this.totalPages = this.tableData.length;
       } else {
         this.$message.error(res.data.message);
@@ -306,55 +388,178 @@ export default {
     search() {
       this.getMerchant();
     },
-    //新增店铺的
+    //点击新增店铺按钮
     openOneShop() {
-      this.openForm.storeName="";
-      this.openForm.desc="";
-      this.openForm.cateId="";
-      this.openForm.contactsName="";
-      this.openForm.contactsPhone="";
-      this.openForm.address="";
+      //每次点击新增店铺就清空文字
+      for (let key in this.openForm) {
+        this.openForm[key] = "";
+      }
       this.openVisible = true;
     },
-    //上传头像的事件
+    //上传logo成功的回调
     handleLogoSuccess(res, file) {
       this.logoImageUrl = URL.createObjectURL(file.raw);
+      //响应体中有图片在服务器中的地址
+      console.log(res);
+      this.openForm.storeLogo = res.data;
     },
+    //上传不合法时的提示
     beforeLogoUpload(file) {
       const isJPG = file.type === "image/jpeg";
+      const isPNG = file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+      if (!isJPG && !isPNG) {
+        this.$message.error("上传头像图片只能是 JPG或PNG 格式!");
       }
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
-      return isJPG && isLt2M;
+      return (isJPG || isPNG) && isLt2M;
     },
+    //上传banner图成功的回调
     handleBannerSuccess(res, file) {
       this.bannerImageUrl = URL.createObjectURL(file.raw);
+      //响应体中有图片在服务器中的地址
+      console.log(res);
+      this.openForm.storeBanner = res.data;
     },
+    //上传不合法时的提示
     beforeBannerUpload(file) {
       const isJPG = file.type === "image/jpeg";
+      const isPNG = file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+      if (!isJPG && !isPNG) {
+        this.$message.error("上传头像图片只能是 JPG或PNG 格式!");
       }
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
-      return isJPG && isLt2M;
+      return (isJPG || isPNG) && isLt2M;
     },
     //备注事件
-    remark(row) {},
-    editing(row) {},
+    remark(row) {
+      this.remarkForm.remark = row.remark;
+      this.remarkForm.storeId = row.storeId;
+      this.remarkVisible = true;
+    },
+    //提交备注
+    async saveRemark() {
+      let res = await this.$axios.post(
+        `admin/sysStore/storeUpdate`,
+        this.remarkForm
+      );
+      console.log(res);
+      if (res.data.code === 200) {
+        this.$message.success("备注成功!");
+        this.getMerchant();
+      } else {
+        this.$message.error(res.data.message);
+      }
+
+      this.remarkVisible = false;
+    },
+    //点编辑按钮
+    editing(row) {
+      //获取信息
+      for (let key in this.editForm) {
+        this.editForm[key] = row[key];
+      }
+      //获取图片路径
+      this.logoImageUrl = row.storeLogo;
+      this.bannerImageUrl = row.storeBanner;
+
+      this.editVisible = true;
+    },
+    //政策
     policy(row) {
+      this.policyForm.storeId=row.storeId;
       this.policyVisible = true;
     },
-    open(row) {},
-    close(row) {},
+    //开启或关闭店铺
+    async openAndClose(row) {
+      //判断状态
+      row.storeState == 1 ? (row.storeState = 0) : (row.storeState = 1);
+
+      let res = await this.$axios.post(`admin/sysStore/storeUpdate`, {
+        storeId: row.storeId,
+        storeState: row.storeState
+      });
+
+      if (res.data.code === 200) {
+        this.$message.success("修改状态成功!");
+        this.getMerchant();
+      } else {
+        this.$message.error(res.data.message);
+      }
+    },
+    //开通店铺对话框的确认开通
+    async confirmOpenShop() {
+      //给店铺加上类型为2
+      this.openForm.storeType = 1;
+      //默认状态为开通
+      this.openForm.storeState = 1;
+
+      let res = await this.$axios.post(
+        `admin/sysStore/storeAdd`,
+        this.openForm
+      );
+      console.log(res);
+      if (res.data.code === 200) {
+        this.$message.success("开通店铺成功!");
+        this.getMerchant();
+      } else {
+        this.$message.error(res.data.message);
+      }
+
+      this.openVisible = false;
+    },
+    //编辑店铺对话框的确认开通
+    confirmEditShop() {},
+    //政策中的文件上传钩子
+    // handleRemove(file, fileList) {
+    //   console.log(file, fileList);
+    // },
+    // handlePictureCardPreview(file) {
+    //     this.dialogImageUrl = file.url;
+    //     this.dialogVisible = true;
+    //   },
+    //店铺政策上传成功的钩子
+    handlePolicy(response, file, fileList) {
+      // console.log(response);
+      // console.log(file);
+      // console.log(fileList);
+  
+      this.imgArr1.push(response.data);
+      console.log(this.imgArr1);
+      this.policyForm.storeNorm=this.imgArr1.join(",")
+      console.log(this.policyForm.storeNorm);
+    },
+    //质量指标上传成功的钩子
+    handleQuality(response, file, fileList) {
+      console.log(fileList);
+
+      this.imgArr2.push(response.data);
+      console.log(this.imgArr2);
+      this.policyForm.storePromote=this.imgArr2.join(",")
+      console.log(this.policyForm.storePromote);
+    },
+    //提交政策
+    async savePolicy(){
+      let res = await this.$axios.post(`admin/sysStore/storeUpdate`, {
+        storeId: this.policyForm.storeId,
+        storeNorm:this.policyForm.storeNorm,
+        storePromote:this.policyForm.storePromote
+      });
+
+      if (res.data.code === 200) {
+        this.$message.success("上传图片成功!");
+        this.getMerchant();
+      } else {
+        this.$message.error(res.data.message);
+      }
+    },
     //切换页码
     handleCurrentChange() {
       this.getMerchant();

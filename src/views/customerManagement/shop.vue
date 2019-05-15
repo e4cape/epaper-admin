@@ -80,7 +80,7 @@
     </el-dialog>
 
     <!-- 编辑铺对话框 -->
-    <el-dialog title="添加店铺" :visible.sync="editVisible" width="400px">
+    <el-dialog title="编辑店铺" :visible.sync="editVisible" width="400px">
       <el-form :model="editForm">
         <el-form-item label="店铺名称" :label-width="formLabelWidth">
           <el-input v-model="editForm.storeName" autocomplete="off"></el-input>
@@ -118,7 +118,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="editVisible = false">取消</el-button>
-        <el-button type="primary" @click="editConfirmAdd">确认添加</el-button>
+        <el-button type="primary" @click="editConfirmAdd">确认修改</el-button>
       </div>
     </el-dialog>
   </div>
@@ -156,7 +156,8 @@ export default {
         contactsName: "",
         contactsPhone: "",
         area: "",
-        supplier: ""
+        supplier: "",
+        storeId:0
       },
       //挂钩分类
       cateList: [],
@@ -205,18 +206,22 @@ export default {
     },
     //点击编辑店铺按钮
     editing(row) {
-      this.editForm.storeName=row.storeName;
-      this.editForm.cateId=row.cateId;
-      this.editForm.prefectureId=row.prefectureId;
-      this.editForm.contactsName=row.contactsName;
-      this.editForm.contactsPhone=row.contactsPhone;
-      this.editForm.area=row.area;
-      this.editForm.supplier=row.supplier;
+      for(let key in this.editForm){
+        this.editForm[key]=row[key];
+      }
       this.editVisible = true;
     },
-    //点击删除按钮
-    deleteShop(row) {
-        
+    //点击关闭按钮
+    async closeShop(row) {
+        let res = await this.$axios.post(`admin/sysStore/storeUpdate`, {storeId:row.storeId});
+      console.log(res);
+      if (res.data.code === 200) {
+        this.$message.success("删除店铺成功!");
+        this.getPlatformShop();
+      } else {
+        this.$message.error(res.data.message);
+      }
+
     },
     //新增的提交
     async openConfirmAdd() {
@@ -236,7 +241,42 @@ export default {
     },
     //编辑的提交
     async editConfirmAdd() {
+      let res = await this.$axios.post(`admin/sysStore/storeUpdate`, this.editForm);
+      console.log(res);
+      if (res.data.code === 200) {
+        this.$message.success("修改店铺成功!");
+        this.getPlatformShop();
+      } else {
+        this.$message.error(res.data.message);
+      }
       this.editVisible = false;
+    },
+    //删除店铺
+    deleteShop(row){
+      this.$confirm("确认删除该店铺, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          //调删除接口
+          let res = await this.$axios.post(`admin/sysStore/api/store/storeDel`,{storeId:row.storeId,storeType:2});
+          if (res.data.code === 200) {
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+           this.getPlatformShop();
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   },
   created() {

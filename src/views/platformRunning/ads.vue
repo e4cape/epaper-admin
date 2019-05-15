@@ -79,7 +79,7 @@ export default {
       //小程序列表数据
       MPtableData:[],
       //图片上传的地址
-      uploadAction: "https://szyizhitong.cn:443/basics/goods/good/uploadimg",
+      uploadAction: "https://szyizhitong.com:443/basics/goods/good/uploadimg",
       //编辑的那一行广告图
       editAd:{
         bannerId:0,
