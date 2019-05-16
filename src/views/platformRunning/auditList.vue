@@ -64,7 +64,7 @@
                 type="primary"
                 :underline="false"
                 v-if="scope.row.carrierState ==2"
-                @click="getCarrierId(scope.row.carrierId)"
+                @click="getCarrierId(scope.row)"
               >审核</el-link>
               <el-link type="info" :underline="false" v-else>无</el-link>
             </template>
@@ -75,7 +75,7 @@
           @current-change="carrierPageChange"
           :current-page="carrierPage"
           layout="total, prev, pager, next, jumper"
-          :total="carrierTotals"
+          :total="carrierTotal"
           background
           class="my-page"
         ></el-pagination>
@@ -107,7 +107,7 @@
                 type="primary"
                 :underline="false"
                 v-if="scope.row.memberCompany.state ==1"
-                @click="getMemberId(scope.row.memberId)"
+                @click="getMemberId(scope.row)"
               >审核</el-link>
               <el-link type="info" :underline="false" v-else>无</el-link>
             </template>
@@ -118,7 +118,7 @@
           @current-change="companyPageChange"
           :current-page="companyPage"
           layout="total, prev, pager, next, jumper"
-          :total="companyTotals"
+          :total="companyTotal"
           background
           class="my-page"
         ></el-pagination>
@@ -175,7 +175,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="companyVisible = false">取 消</el-button>
-        <el-button type="primary" @click="carrierCheck">确定</el-button>
+        <el-button type="primary" @click="companyCheck">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -198,14 +198,14 @@ export default {
       auditPage: 1,
       auditTotals: 0,
       //承运商审核的页码
-      carrierPage:1,
-      carrierTotal:0,
+      carrierPage: 1,
+      carrierTotal: 0,
       //公司审核的页码
-      companyPage:1,
-      companyTotal:0,
+      companyPage: 1,
+      companyTotal: 0,
       //三个审核对话框的可见性
       auditVisible: false,
-      carrierVisible: false    ,
+      carrierVisible: false,
       companyVisible: false,
       auditForm: {
         auditRadio: "1",
@@ -217,7 +217,7 @@ export default {
         carrierText: ""
       },
       companyForm: {
-        companyRadio: "",
+        companyRadio: "1",
         companyText: ""
       },
       //货源审核发请求的数据
@@ -234,17 +234,19 @@ export default {
         carrierCheck: "",
         carrierId: 0,
         //默认让通过,填1,不通过就传0
-        carrierState: 1
+        carrierState: 1,
+        carrierMemberId: 0,
+        memberType:0
       },
       //公司审核发请求的数据
       companyList: {
-        memberCompany:{
+        memberCompany: {
           check: "",
           //2是开通,0是驳回
-          state:2
+          state: 2
         },
         memberId: 0,
-       
+        memberType:0
       },
       //表单校验规则
       rules: {
@@ -264,7 +266,7 @@ export default {
       // console.log(res);
       if (res.data.code === 200) {
         this.auditData = res.data.data.items;
-        this.auditTotals  = res.data.data.items.length;
+        this.auditTotals = res.data.data.items.length;
       }
     },
     //获取承运商列表事件
@@ -274,8 +276,8 @@ export default {
       );
       // console.log(res);
       if (res.data.code === 200) {
-        this.carrierData = res.data.data.items;
-        this.carrierTotal = res.data.data.items.length;
+        this.carrierData = res.data.data.list;
+        this.carrierTotal = res.data.data.list.length;
       }
     },
     //获取公司列表事件
@@ -285,8 +287,17 @@ export default {
       );
       // console.log(res);
       if (res.data.code === 200) {
-        this.companyData = res.data.data.items;
-        this.companyTotal = res.data.data.items.length;
+        this.companyData = res.data.data.list;
+        this.companyTotal = res.data.data.list.length;
+
+        //返回的memberCompany是json格式
+        this.companyData.forEach(v => {
+          if (v.memberCompany) {
+            console.log(v.memberCompany);
+            v.memberCompany = JSON.parse(v.memberCompany);
+            console.log(v.memberCompany);
+          }
+        });
       }
     },
     //tab栏切换事件
@@ -311,14 +322,19 @@ export default {
       this.auditVisible = true;
     },
     //获取carrierId事件
-    getCarrierId(id) {
-      this.carrierList.carrierId = id;
+    getCarrierId(row) {
+      this.carrierList.carrierId = row.carrierId;
+      this.carrierList.memberType = row.memberType;
+      this.carrierList.carrierMemberId = row.carrierMemberId;
+      
       console.log(this.carrierList.carrierId);
       this.carrierVisible = true;
+
     },
     //获取memberId事件
-    getMemberId(id) {
-      this.companyList.memberId = id;
+    getMemberId(row) {
+      this.companyList.memberId = row.memberId;
+      this.companyList.memberType = row.memberType;
       this.companyVisible = true;
     },
 
@@ -335,7 +351,10 @@ export default {
       //审核指导价
       this.checkList.routeCheckReason = this.auditForm.guidePrice;
 
-      let res = await this.$axios.post("admin/sysUser/checkRoute", this.checkList);
+      let res = await this.$axios.post(
+        "admin/sysUser/checkRoute",
+        this.checkList
+      );
       console.log(res);
       if (res.data.code == 200) {
         this.getAuditCheck();
@@ -378,7 +397,9 @@ export default {
       this.companyList.memberCompany.check = this.companyForm.companyText;
 
       //memberCompany要转成json字符串
-      this.companyList.memberCompany=JSON.stringify(this.companyList.memberCompany);
+      this.companyList.memberCompany = JSON.stringify(
+        this.companyList.memberCompany
+      );
 
       let res = await this.$axios.post("admin/sysUser/aduit", this.companyList);
       console.log(res);
@@ -388,8 +409,9 @@ export default {
         this.$message.error(res.data.message);
       }
 
-      this.carrierVisible = false;
+      this.companyVisible = false;
     },
+
     //货源审核列表页码改变事件
     auditPageChange() {
       this.getAuditCheck();
@@ -399,7 +421,7 @@ export default {
       this.getCarrierList();
     },
     //公司审核列表页码改变事件
-    companyPageChange(){
+    companyPageChange() {
       this.getCompanyList();
     }
   },

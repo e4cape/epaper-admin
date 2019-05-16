@@ -279,7 +279,7 @@ export default {
     },
     //过滤企业账号
     getMember(value) {
-      return value == 2 ? "是" : "否";
+      return value == 2||value == 4 ? "是" : "否";
     },
     //过滤来源
     getSource(value) {
